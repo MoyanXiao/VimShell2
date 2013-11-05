@@ -35,7 +35,7 @@ endf
 
 " save log to a file
 fun! log#savelog(filename)
-    " code
+    " TODO save to file
 endf
 
 " print the log this runtime
