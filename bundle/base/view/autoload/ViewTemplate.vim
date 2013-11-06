@@ -7,8 +7,9 @@ let s:viewSet={}
 let s:viewBase={}
 
 let s:viewBase.keyMap={}
-let s:viewBase.title="No title"
 let s:viewBase.bufNo=-1
+let s:viewBase.title="No title"
+let s:viewBase.content=""
 
 fun! ViewTemplate#createView(viewType, viewName)
     if has_key(s:viewSet, a:viewName)
@@ -38,6 +39,10 @@ fun! s:viewBase.setTitle(title)
     let self.title=a:title
 endf
 
+fun! s:viewBase.setContent(content)
+    let self.content=a:content
+endf
+
 fun! s:viewBase.openView()
     call self.openWinPre()
 
@@ -46,6 +51,8 @@ fun! s:viewBase.openView()
     endif
 
     call self.openWin()
+
+    call self.viewContent()
 
     let self.bufNo=bufnr('%')
 
@@ -71,6 +78,14 @@ fun! s:viewBase.openWin()
     LogDebug "viewBase openWin"
     exec 'silent pedit [viewBase] '.self.title
     wincmd P | wincmd H
+endf
+
+fun! s:viewBase.viewContent()
+    LogDebug "viewBase viewContent"
+    let tme_opt=&cpoptions
+    setl modifiable
+    append(0, self.content)
+    let cpoptions=&tme_opt
 endf
 
 fun! s:viewBase.viewOptions()
