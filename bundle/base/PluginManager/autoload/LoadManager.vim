@@ -39,6 +39,103 @@ fun! LoadManager#LoadAllPlugins()
     exec "runtime! after/*.vim"
 endf
 
+fun! LoadManager#LoadSuite(suitename)
+    LogNotice "Starting to enable and load the suite ".a:suitename
+    let plugins=plugin#findPlugin()
+    if !has_key(plugins, a:suitename)
+        LogError "Could not find the plugin suite:".a:suitename
+        return
+    endif
+
+    plugins[a:suitename]["enable"]="True"
+
+    for [key, value] in items(plugins[a:suitename])
+        if key == "enable"
+            unlet value
+            continue
+        endif
+
+        if value["enable"] == "True"
+            LogNotice "Loading the plugin ".key
+            call s:rtp_add(value["path"])
+            let value["load"]="loaded"
+        endif
+        unlet value
+    endfor 
+endf
+
+fun! LoadManager#LoadPlugin(...)
+    if a:0 == 0 || a:0 > 2
+        return
+    endif
+
+    if a:0 == 1
+        let plugin=plugin#findPlugin(a:1)
+        if plugin == null
+            LogError "Could not find the plugin:".a:1
+            return
+        endif
+        LogNotice "Load and enable the plugin:".a:1
+        let plugin["load"]="loaded"
+        let plugin["enable"]="True"
+        call s:rtp_add(plugin["path"])
+        exec "runtime! plugin/*.vim"
+        exec "runtime! after/*.vim"
+    endif
+
+    if a:0 == 2
+        let plugin=plugin#findPlugin(a:1,a:2)
+        if plugin == null
+            LogError "could not find the plugin ".a:2." in the suite ".a:1
+            return
+        endif
+        LogNotice "Load and enable the plugin:".a:1
+        let plugin["load"]="loaded"
+        let plugin["enable"]="True"
+        call s:rtp_add(plugin["path"])
+        exec "runtime! plugin/*.vim"
+        exec "runtime! after/*.vim"
+    endif
+endf
+
+fun! LoadManager#DisableSuite(suitename)
+    let suites=plugin#findPlugin()
+    if !has_key(suites, a:suitename)
+        LogError "Could not find the suite ".a:suitename
+        return
+    endif
+    LogNotice "Disable the plugin : ".a:suitename
+    suites[a:suitename]["enable"]="False"
+endf
+
+fun! LoadManager#DisablePlugin(...)
+    if a:0 == 0 || a:0 > 2
+        return
+    endif
+
+    if a:0 == 1
+        let plugin=plugin#findPlugin(a:1)
+        if plugin == null
+            LogError "Could not find the plugin:".a:1
+            return
+        endif
+        LogNotice "Disable the plugin ".a:1
+        plugin["enable"]="False"
+        return
+    endif
+
+    if a:0 == 2
+        let plugin=plugin#findPlugin(a:1, a:2)
+        if plugin == null
+            LogError "Could not find the plugin:".a:2." in the suite ".a:1
+            return
+        endif
+        LogNotice "Disable the plugin ".a:2." in the suite ".a:1
+        plugin["enable"]="False"
+        return
+    endif
+endf
+
 fun! s:rtp_add(path)
     exec "set rtp^=".fnameescape(a:path)
     exec "set rtp+=".fnameescape(a:path)
