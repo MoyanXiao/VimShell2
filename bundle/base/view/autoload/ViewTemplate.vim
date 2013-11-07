@@ -4,26 +4,21 @@
 " Last Modified: November 05, 2013
 
 let s:viewSet={}
-let s:viewBase={}
 
-let s:viewBase.keyMap={}
-let s:viewBase.bufNo=-1
-let s:viewBase.title="No title"
-let s:viewBase.content=""
-
+" interface to create and remove view
 fun! ViewTemplate#createView(viewType, viewName)
     if has_key(s:viewSet, a:viewName)
-        LogNotice "Find the view ".a:viewName." don't create a new one".a:viewType
+        LogNotice "Find the view ".a:viewName." don't create a new one ".a:viewType
         return s:viewSet[a:viewName]
     endif
     LogNotice "Create the view ".a:viewName." with the type ".a:viewType
     try
-        let s:viewSet[a:viewName]=extend(deepcopy(s:viewBase), deepcopy({a:viewName}#extension())) 
+        let s:viewSet[a:viewName]=extend(deepcopy(s:viewBase), deepcopy({a:viewType}#extension())) 
     catch /.*/
         LogError "error occurs : ".v:exception
         LogNotice "create the viewBase"
         let s:viewSet[a:viewName]=deepcopy(s:viewBase)
-    endt
+    endtry
     return s:viewSet[a:viewName]
 endf
 
@@ -35,65 +30,38 @@ fun! ViewTemplate#removeView(viewName)
     LogNotice "Can't find the view ".a:viewName
 endf
 
+" viewBase is the base class
+let s:viewBase={}
+let s:viewBase.keyMap={}
+let s:viewBase.bufNo=-1
+let s:viewBase.title="No title"
+let s:viewBase.content=""
+
+" Set the title of the view 
+" MUST be set before openView()
 fun! s:viewBase.setTitle(title)
     let self.title=a:title
 endf
 
+" Set the content of the view 
+" MUST be set before openView()
 fun! s:viewBase.setContent(content)
     let self.content=a:content
 endf
 
+" openView is to use start the view
 fun! s:viewBase.openView()
     call self.openWinPre()
-
     if bufexists(self.bufNo) && bufloaded(self.bufNo)
         exec self.bufNo.'bd!'
     endif
-
     call self.openWin()
-
     call self.viewContent()
-
     let self.bufNo=bufnr('%')
-
     call self.viewOptions()
-    
     call self.viewCommands()
-    
     call self.viewKeyMap()
-
     call self.openWinPost()
-endf
-
-fun! s:viewBase.openWinPre()
-    LogDebug "viewBase openWinPre"
-    
-endf
-
-fun! s:viewBase.openWinPost()
-    LogDebug "viewBase openWinPost"
-endf
-
-fun! s:viewBase.openWin()
-    LogDebug "viewBase openWin"
-    exec 'silent pedit [viewBase] '.self.title
-    wincmd P | wincmd H
-endf
-
-fun! s:viewBase.viewContent()
-    LogDebug "viewBase viewContent"
-    let tme_opt=&cpoptions
-    setl modifiable
-    append(0, self.content)
-    let cpoptions=&tme_opt
-endf
-
-fun! s:viewBase.viewOptions()
-    LogDebug "viewBase viewOptions"
-endf
-
-fun! s:viewBase.viewCommands()
-    LogDebug "viewBase viewCommands"
 endf
 
 fun! s:viewBase.viewKeyMap()
@@ -102,3 +70,36 @@ fun! s:viewBase.viewKeyMap()
         exec "nnoremap <buffer> ".key." ".value
     endfor
 endf
+
+fun! s:viewBase.openWin()
+    LogDebug "viewBase openWin"
+    exec 'silent pedit [view] '.self.title
+    wincmd P | wincmd H
+endf
+
+fun! s:viewBase.viewContent()
+    setl modifiable
+    LogDebug "add the content: ".string(self.content)
+    call append(0, self.content)
+endf
+
+" To overwrite in the extension
+fun! s:viewBase.openWinPre()
+    LogDebug "viewBase openWinPre"
+endf
+
+" To overwrite in the extension
+fun! s:viewBase.openWinPost()
+    LogDebug "viewBase openWinPost"
+endf
+
+" To overwrite in the extension
+fun! s:viewBase.viewOptions()
+    LogDebug "viewBase viewOptions"
+endf
+
+" To overwrite in the extension
+fun! s:viewBase.viewCommands()
+    LogDebug "viewBase viewCommands"
+endf
+
