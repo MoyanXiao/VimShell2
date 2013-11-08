@@ -13,7 +13,7 @@
 "            \}
 
 let s:plugin_dict={}
-let s:bundle_dir=['/home/Source/vimplugin/VimShell2/bundle']
+let s:bundle_dir=[g:bundle_dir]
 
 fun! plugin#dirworker()
     for item in s:bundle_dir

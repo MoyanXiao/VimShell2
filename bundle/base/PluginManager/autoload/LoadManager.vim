@@ -18,6 +18,7 @@ endf
 
 fun! LoadManager#LoadAllPlugins()
     LogNotice "Starting to load the plugins..."
+    call plugin#dirworker()
     let plugins=plugin#findPlugin()
     for [key, value] in items(plugins)
         if value["enable"] == "False"
