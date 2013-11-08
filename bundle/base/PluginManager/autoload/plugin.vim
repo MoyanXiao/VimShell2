@@ -65,13 +65,13 @@ endf
 fun! plugin#listPluginStatus()
     let retstr = []
     for [key, value] in items(s:plugin_dict)
-        let retstr = retstr + ["Suite Name : ".key.", enable status: ".value["enable"]]
+        let retstr = retstr + ["SuiteName:".key."\tEnableStatus:".value["enable"]]
         for [key1, value1] in items(value)
             if key1 == 'enable'
                 unlet value1
                 continue
             endif
-            let retstr = retstr + ["\t"."Status:".value1["load"].",\tenable:".value1["enable"]."\t\tName:".key1]
+            let retstr = retstr + ["\tStatus:".value1["load"]."\tenable:".value1["enable"]."\tPluginName:".key1]
             unlet value1
         endfor
     endfor
@@ -88,13 +88,13 @@ fun! plugin#findPlugin(...)
                 return value[a:1]
             endif
         endfor
-        return null
+        return {}
     endif
     try
         return s:plugin_dict[a:1][a:2]
     catch
         LogError "could not find the plugin info ".a:1."->".a:2
-        return null
+        return {}
     endtry
 endf
 

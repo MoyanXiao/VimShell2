@@ -8,9 +8,12 @@ let s:loadview={}
 
 fun! LoadManager#doConfig()
     let s:loadview=ViewTemplate#createView("LoadConfigView", "PluginConfigLoad")
-    call s:loadview.setTitle("Plugin Load Configuration")
     call s:loadview.setContent(plugin#listPluginStatus())
     call s:loadview.openView()
+endf
+
+fun! LoadManager#RefreshConfig()
+    call s:loadview.updateContent(plugin#listPluginStatus())
 endf
 
 fun! LoadManager#LoadAllPlugins()
@@ -71,7 +74,7 @@ fun! LoadManager#LoadPlugin(...)
 
     if a:0 == 1
         let plugin=plugin#findPlugin(a:1)
-        if plugin == null
+        if empty(plugin)
             LogError "Could not find the plugin:".a:1
             return
         endif
@@ -85,7 +88,7 @@ fun! LoadManager#LoadPlugin(...)
 
     if a:0 == 2
         let plugin=plugin#findPlugin(a:1,a:2)
-        if plugin == null
+        if empty(plugin)
             LogError "could not find the plugin ".a:2." in the suite ".a:1
             return
         endif
@@ -105,7 +108,7 @@ fun! LoadManager#DisableSuite(suitename)
         return
     endif
     LogNotice "Disable the plugin : ".a:suitename
-    suites[a:suitename]["enable"]="False"
+    let suites[a:suitename]["enable"]="False"
 endf
 
 fun! LoadManager#DisablePlugin(...)
@@ -115,23 +118,23 @@ fun! LoadManager#DisablePlugin(...)
 
     if a:0 == 1
         let plugin=plugin#findPlugin(a:1)
-        if plugin == null
+        if empty(plugin)
             LogError "Could not find the plugin:".a:1
             return
         endif
         LogNotice "Disable the plugin ".a:1
-        plugin["enable"]="False"
+        let plugin["enable"]="False"
         return
     endif
 
     if a:0 == 2
         let plugin=plugin#findPlugin(a:1, a:2)
-        if plugin == null
+        if empty(plugin)
             LogError "Could not find the plugin:".a:2." in the suite ".a:1
             return
         endif
         LogNotice "Disable the plugin ".a:2." in the suite ".a:1
-        plugin["enable"]="False"
+        let plugin["enable"]="False"
         return
     endif
 endf

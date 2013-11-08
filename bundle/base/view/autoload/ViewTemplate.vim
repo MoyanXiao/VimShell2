@@ -79,8 +79,16 @@ endf
 
 fun! s:viewBase.viewContent()
     setl modifiable
+    normal ggdG
     LogDebug "add the content: ".string(self.content)
     call append(0, self.content)
+    setl nomodifiable
+endf
+
+fun! s:viewBase.updateContent(content)
+    LogDebug "viewBase updateContent"
+    call self.setContent(a:content)
+    call self.viewContent()
 endf
 
 " To overwrite in the extension
