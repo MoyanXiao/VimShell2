@@ -3,6 +3,10 @@
 " Description: 
 " Last Modified: November 04, 2013
 
+if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
+    finish
+endif
+
 let s:logBuf=[]
 let s:loglvl=1
 

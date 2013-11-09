@@ -3,6 +3,10 @@
 " Description: 
 " Last Modified: November 07, 2013
 
+if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
+    finish
+endif
+
 let s:loadview={}
 let s:loadview.keyMap={
             \'q' : ':silent bd!<CR>',

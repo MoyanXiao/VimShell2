@@ -4,6 +4,10 @@
 " Last Modified: November 07, 2013
 "
 
+if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
+    finish
+endif
+
 let s:loadview={}
 
 fun! LoadManager#doConfig()

@@ -4,6 +4,11 @@
 " Last Modified: November 06, 2013
 "
 "
+if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
+    finish
+endif
+
+"
 "s:plugin_dict = {
 "            \suitename:{
 "            \      pluginname:{attributes}
@@ -20,6 +25,9 @@ fun! plugin#dirworker()
         LogDebug "bundle_dir item is ".item
         let suitelist=split(expand(item.'/*'),'\n')
         for snpath in suitelist
+            if !isdirectory(snpath)
+                continue
+            endif
             let sn=fnamemodify(snpath,':t')
             LogDebug "add suite ".sn." in the bundle_dir ".item
             let s:plugin_dict[sn]={'enable' : 'True'}

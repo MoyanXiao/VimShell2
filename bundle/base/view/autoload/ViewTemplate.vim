@@ -3,6 +3,10 @@
 " Description: 
 " Last Modified: November 05, 2013
 
+if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
+    finish
+endif
+
 let s:viewSet={}
 
 " interface to create and remove view
