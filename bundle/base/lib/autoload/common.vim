@@ -9,7 +9,7 @@ function! common#guardScriptLoading(path, vimVersion, exprs)
     for expr in a:exprs
         if !eval(expr)
             echoerr a:path . ' requires: ' . expr
-            return 0                                                                                                                                                                                                                              
+            return 0
         endif
     endfor
     let {loadedVarName} = 1
