@@ -14,7 +14,16 @@ fun! InstallManager#install(suite, name)
     let pldict['suite']=a:suite
     let pldict['path']=expand(g:bundle_dir).'/'.a:suite.'/'.pldict['name']
     LogDebug "Create new plugin info:".string(pldict)
-    call s:sync(1,pldict)
+    let ret=s:sync(1,pldict)
+    if ret =~ 'error'
+        return
+    endif
+    let rtplist=split(&rtp, ',')
+    let pldict['filelist']=split(expand(pldict['path'].'/**'))
+    let pldict['load']=(index(rtplist,pldict['path'])<0)?'unload':'loaded'
+    let pldict['enable']='True'
+    call s:update_plugin(a:suite, pldict)
+    call s:create_changelog()
 endf
 
 func! s:check_suite(suite)
@@ -44,28 +53,25 @@ func! s:check_suite(suite)
 endf
 
 func! s:create_changelog() abort
+    let tmp=log#level(3)
     for bundle_data in s:updated_bundles
         let initial_sha = bundle_data[0]
         let updated_sha = bundle_data[1]
         let bundle      = bundle_data[2]
-
         let cmd = 'cd '.shellescape(bundle.path()).
                     \              ' && git log --pretty=format:"%s   %an, %ar" --graph '.
                     \               initial_sha.'..'.updated_sha
-
         let updates = system(cmd)
-
         LogNotice 'Updated Bundle: '.bundle
-
         if bundle.uri =~ "https://github.com"
             LogNotice 'Compare at: '.bundle.uri[0:-5].'/compare/'.initial_sha.'...'.updated_sha)
         endif
-
         for update in split(updates, '\n')
             let update = substitute(update, '\s\+$', '', '')
             LogNotice '  '.update
         endfor
     endfor
+    call log#level(tmp)
 endf
 
 
@@ -130,4 +136,15 @@ func! s:parse_name(arg)
     let name = substitute(name,'\..*$','','g') 
 
     return {'name': name, 'uri': uri, 'name_spec': arg }
+endf
+
+func! s:update_plugin(suite, plugin)
+    LogNotice "update the plugin:".a:plugin.name." in the suite:".a:suite.""
+    let pInfo=plugin#findPlugin()
+    if !exists("pInfo[a:suite]")
+        let pInfo[a:suite]={'enable':'True'}
+        let pInfo[a:suite][a:plugin.name]=a:plugin
+    elseif
+        let pInfo[a:suite][a:plugin.name]=a:plugin
+    endif
 endf

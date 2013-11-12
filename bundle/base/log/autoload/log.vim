@@ -61,5 +61,7 @@ fun! log#level(lvl)
         return
     endif
     call log#notice("Change the log level to ".(["NONE","ERROR","NOTICE","DEBUG"][a:lvl]))
+    let tmp=s:loglvl
     let s:loglvl=a:lvl
+    return tmp
 endf
