@@ -21,6 +21,7 @@ let s:plugin_dict={}
 let s:bundle_dir=[g:bundle_dir]
 
 fun! plugin#dirworker()
+    let rtplist=split(&rtp, ',')
     for item in s:bundle_dir
         LogDebug "bundle_dir item is ".item
         let suitelist=split(expand(item.'/*'),'\n')
@@ -41,8 +42,13 @@ fun! plugin#dirworker()
                 let suiteset=s:plugin_dict[sn]
                 let suiteset[pn]={}
                 let plgset=suiteset[pn]
+                let plgset['name']=pn
+                let plgset['uri']=''
+                let plgset['name_spec']=''
+                let plgset['suite']=sn
                 let plgset['path']=pnpath
-                let plgset['load']='unload'
+                let plgset['filelist']=split(expand(pnpath.'/**'))
+                let plgset['load']=(index(rtplist, pnpath)<0)?'unload':'loaded'
                 let plgset['enable']='True'
                 " TODO other init
             endfor
@@ -63,6 +69,7 @@ fun! plugin#listPlugins()
             let retstr = retstr."\tPlugin ".key1." with attributes:"."\n"
             for [key2,value2] in items(value1)
                 let retstr = retstr."\t\t".key2.":".string(value2)."\n"
+                unlet value2
             endfor
             unlet value1
         endfor
