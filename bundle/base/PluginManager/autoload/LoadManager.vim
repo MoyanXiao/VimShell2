@@ -8,6 +8,7 @@ if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
     finish
 endif
 
+" Some Function calling s:loadview should use carefully
 let s:loadview={}
 
 fun! LoadManager#doConfig()
@@ -16,7 +17,20 @@ fun! LoadManager#doConfig()
     call s:loadview.openView()
 endf
 
+fun! LoadManager#undoConfig()
+    call ViewTemplate#removeView("PluginConfigLoad")
+endf
+
 fun! LoadManager#RefreshConfig()
+    if exists("s:loadview") && len(s:loadview)==0
+        return
+    endif
+
+    if s:loadview.check() < 0
+        call LoadManager#undoConfig()
+        let s:loadview={}
+        return
+    endif
     call s:loadview.updateContent(plugin#listPluginStatus())
 endf
 
@@ -55,7 +69,7 @@ fun! LoadManager#LoadSuite(suitename)
         return
     endif
 
-    plugins[a:suitename]["enable"]="True"
+    let plugins[a:suitename]["enable"]="True"
 
     for [key, value] in items(plugins[a:suitename])
         if key == "enable"

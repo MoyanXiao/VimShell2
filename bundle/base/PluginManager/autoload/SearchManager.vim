@@ -4,6 +4,10 @@
 " Last Modified: November 11, 2013  
 "
 
+if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
+    finish
+endif
+
 fun! SearchManager#SearchPlugin(plname)
     return reverse(filter(s:load_scripts(0), 'v:val =~? "'.escape(a:plname, '"').'"'))
 endf

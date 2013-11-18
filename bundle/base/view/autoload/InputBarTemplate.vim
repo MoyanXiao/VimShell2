@@ -72,6 +72,7 @@ fun! s:inputBar.closeBar()
         AutoComplPopUnlock
     endif
     exec ":q"
+
 endf
 
 fun! s:inputBar.onCursorMovedI()
@@ -97,6 +98,10 @@ fun! s:inputBar.onCr()
         return
     endif
     let self.result=self.removePrompt(getline('.'))
+    if exists("self.FinishHook")
+        call self.FinishHook(self.suite, self.result)
+        unlet self.FinishHook
+    endif
     call feedkeys("\<Esc>", 'n') " stopinsert behavior is strange...
 endf
 
@@ -129,9 +134,9 @@ fun! s:inputBar.onComplete(findstart, base)
     endif
     call s:highlightPrompt(self.getPrompt())
     " TODO this is a fake"
-    if exists("self.MatchStringList")
-        let items = self.MatchStringList(self.removePrompt(a:base))
-        "call map(items, '"          ".v:val')
+    if exists("self.CompleteHook")
+        let items = self.CompleteHook(self.removePrompt(a:base))
+        unlet self.CompleteHook
     else
         let items = []
     endif

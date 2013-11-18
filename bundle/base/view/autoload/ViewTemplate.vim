@@ -60,8 +60,8 @@ fun! s:viewBase.openView()
         exec self.bufNo.'bd!'
     endif
     call self.openWin()
-    call self.viewContent()
     let self.bufNo=bufnr('%')
+    call self.viewContent()
     call self.viewOptions()
     call self.viewCommands()
     call self.viewKeyMap()
@@ -82,11 +82,27 @@ fun! s:viewBase.openWin()
 endf
 
 fun! s:viewBase.viewContent()
+    if !(bufexists(self.bufNo) && bufloaded(self.bufNo))
+        LogError "Don't support change the unopened config view"
+        return
+    endif
+    if self.bufNo != bufnr('%')
+        LogError "The file you are trying to update is not the config view!!!!!Dangerous!!!!return to the config"
+        exec bufwinnr(self.bufNo).'wincmd w'
+    endif
     setl modifiable
     normal ggdG
     LogDebug "add the content: ".string(self.content)
     call append(0, self.content)
     setl nomodifiable
+endf
+
+fun! s:viewBase.check()
+    if !(bufexists(self.bufNo) && bufloaded(self.bufNo))
+        LogError "Don't support change the unopened config view"
+        return -1
+    endif
+    return 0
 endf
 
 fun! s:viewBase.updateContent(content)

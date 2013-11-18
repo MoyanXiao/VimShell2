@@ -11,6 +11,7 @@ let s:loadview={}
 let s:loadview.keyMap={
             \'q' : ':silent bd!<CR>',
             \'l' : ':LoadP<CR>',
+            \'i' : ':InstallP<CR>',
             \'D' : ':DisableP<CR>'
             \}
 
@@ -21,6 +22,7 @@ endf
 fun! s:loadview.viewOptions()
     setl buftype=nofile
     setl noswapfile
+    setlocal bufhidden=delete
 
     setl cursorline
     setl nonu ro noma ignorecase 
@@ -40,6 +42,7 @@ endf
 fun! s:loadview.viewCommands()
     com! -buffer -nargs=0 LoadP call s:loadPlugin()
     com! -buffer -nargs=0 DisableP call s:disablePlugin()
+    com! -buffer -nargs=0 InstallP call s:searchPlugin()
 endf
 
 fun! s:loadPlugin()
@@ -107,3 +110,19 @@ fun! s:getPluginName(str)
     return split(filter(split(a:str, '\t'), 'v:val =~ "PluginName"')[0], ':')[1]
 endf
 
+fun! s:searchPlugin()
+    let bar=InputBarTemplate#getInputBar()
+    let bar["CompleteHook"]=function("SearchManager#SearchPlugin")
+    let bar["FinishHook"]=function("InstallManager#install")
+    let bar["suite"]="tmp"
+    let curlineNum=line('.')
+    let curline=getline(curlineNum)
+    while curlineNum > 0
+        if match(curline, "SuiteName") > -1
+            let bar["suite"] = s:getSuiteName(curline)
+            break
+        endif
+        let curlineNum -= 1
+    endwhile
+    call bar.openBar()
+endf

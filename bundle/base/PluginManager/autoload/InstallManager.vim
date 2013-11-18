@@ -1,3 +1,8 @@
+" File: InstallManager.vim
+" Author: Moyan Xiao
+" Description: 
+" Last Modified: November 18, 2013
+
 if !common#guardScriptLoading(expand("<sfile>:p"), 702, [])
     finish
 endif
@@ -142,9 +147,11 @@ func! s:update_plugin(suite, plugin)
     LogNotice "update the plugin:".a:plugin.name." in the suite:".a:suite.""
     let pInfo=plugin#findPlugin()
     if !exists("pInfo[a:suite]")
+        LogDebug "Don't exists the suite:".a:suite.", create a new one"
         let pInfo[a:suite]={'enable':'True'}
         let pInfo[a:suite][a:plugin.name]=a:plugin
-    elseif
+    else
+        LogDebug "Exists the suite:".a:suite
         let pInfo[a:suite][a:plugin.name]=a:plugin
     endif
 endf
