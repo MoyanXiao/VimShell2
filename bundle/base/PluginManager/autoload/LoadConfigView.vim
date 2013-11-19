@@ -114,6 +114,7 @@ fun! s:searchPlugin()
     let bar=InputBarTemplate#getInputBar()
     let bar["CompleteHook"]=function("SearchManager#SearchPlugin")
     let bar["FinishHook"]=function("InstallManager#install")
+    let bar["RefreshHook"]=function("LoadManager#RefreshConfig")
     let bar["suite"]="tmp"
     let curlineNum=line('.')
     let curline=getline(curlineNum)

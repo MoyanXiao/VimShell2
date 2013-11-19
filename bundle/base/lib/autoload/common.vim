@@ -1,3 +1,8 @@
+" File: common.vim
+" Author: Moyan Xiao
+" Description: 
+" Last Modified: November 18, 2013
+
 function! common#guardScriptLoading(path, vimVersion, exprs)
     let loadedVarName = 'g:loaded_' . substitute(join(split(a:path,'/')[-3:], '_'), '\W', '_', 'g')
     if exists(loadedVarName)

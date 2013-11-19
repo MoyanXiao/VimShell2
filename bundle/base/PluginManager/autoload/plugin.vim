@@ -19,6 +19,8 @@ endif
 
 let s:plugin_dict={}
 let s:bundle_dir=[g:bundle_dir]
+let g:displugins=readfile(globpath(&rtp,"mask/DisPlugins.mask"))
+let g:dissuite=readfile(globpath(&rtp,"mask/DisSuite.mask"))
 
 fun! plugin#dirworker()
     let rtplist=split(&rtp, ',')
@@ -31,7 +33,8 @@ fun! plugin#dirworker()
             endif
             let sn=fnamemodify(snpath,':t')
             LogDebug "add suite ".sn." in the bundle_dir ".item
-            let s:plugin_dict[sn]={'enable' : 'True'}
+            let s:plugin_dict[sn]={}
+            let s:plugin_dict[sn]['enable']=(index(g:dissuite, sn)<0)?'True':'False'
             let pluginlist=split(expand(snpath.'/*'))
             for pnpath in pluginlist
                 if !isdirectory(pnpath)
@@ -49,12 +52,32 @@ fun! plugin#dirworker()
                 let plgset['path']=pnpath
                 let plgset['filelist']=split(expand(pnpath.'/**'))
                 let plgset['load']=(index(rtplist, pnpath)<0)?'unload':'loaded'
-                let plgset['enable']='True'
+                let plgset['enable']=(index(g:displugins, pn)<0)?'True':'False'
                 " TODO other init
             endfor
         endfor
     endfor
     LogDebug plugin#listPlugins()
+endf
+
+fun! plugin#saveEnableStatus()
+    let pls=[]
+    let sus=[]
+    for [key, value] in items(s:plugin_dict)
+        for [key1, value1] in items(value)
+            if key1 == 'enable' && value1 == 'False'
+                call add(sus, key)
+                unlet value1
+                continue
+            endif
+            if value1['enable'] == 'False'
+                call add(pls, key1)
+            endif
+            unlet value1
+        endfor
+    endfor
+    call workspaceInfo#saveInfo("g:dissuite", string(sus))
+    call workspaceInfo#saveInfo("g:displugins", string(pls))
 endf
 
 fun! plugin#listPlugins()

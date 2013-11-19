@@ -72,7 +72,9 @@ fun! s:inputBar.closeBar()
         AutoComplPopUnlock
     endif
     exec ":q"
-
+    if exists("self.RefreshHook")
+        call self.RefreshHook()
+    endf
 endf
 
 fun! s:inputBar.onCursorMovedI()
