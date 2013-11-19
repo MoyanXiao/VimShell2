@@ -65,6 +65,12 @@ function! common#Input ( promp, text, ... )
     return retval
 endfunction  
 
+fun! common#defineDefaultVariable(name, value)
+    if !exists(a:name)
+        let {a:name}=a:value
+    endif
+endf
+
 function! common#Confirm( msg, conList, ...)
     if len(a:conList) == 0
         return ""

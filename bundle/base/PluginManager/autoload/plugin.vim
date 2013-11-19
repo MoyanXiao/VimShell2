@@ -19,8 +19,8 @@ endif
 
 let s:plugin_dict={}
 let s:bundle_dir=[g:bundle_dir]
-let g:displugins=readfile(globpath(&rtp,"mask/DisPlugins.mask"))
-let g:dissuite=readfile(globpath(&rtp,"mask/DisSuite.mask"))
+call common#defineDefaultVariable("g:displugins",readfile(globpath(&rtp,"mask/DisPlugins.mask")))
+call common#defineDefaultVariable("g:dissuite",readfile(globpath(&rtp,"mask/DisSuite.mask")))
 
 fun! plugin#dirworker()
     let rtplist=split(&rtp, ',')
@@ -76,8 +76,8 @@ fun! plugin#saveEnableStatus()
             unlet value1
         endfor
     endfor
-    call workspaceInfo#saveInfo("g:dissuite", string(sus))
-    call workspaceInfo#saveInfo("g:displugins", string(pls))
+    call workspaceInfo#saveInfo("g:dissuite",sus)
+    call workspaceInfo#saveInfo("g:displugins",pls)
 endf
 
 fun! plugin#listPlugins()

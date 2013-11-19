@@ -1,3 +1,9 @@
+" File: BunbleInit.vim
+" Author: Moyan Xiao
+" Description: 
+" Last Modified: November 20, 2013
+"
+
 let g:bundle_dir=expand("<sfile>:p:h")
 
 let s:base_dir=g:bundle_dir."/base"
