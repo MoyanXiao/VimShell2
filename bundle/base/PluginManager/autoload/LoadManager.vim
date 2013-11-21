@@ -52,6 +52,7 @@ fun! LoadManager#LoadAllPlugins()
                 LogNotice "Loading the plugin ".key1
                 call s:rtp_add(value1["path"])
                 let value1["load"]="loaded"
+                call s:helptags(value1["path"])
             endif
             unlet value1
         endfor
@@ -81,6 +82,9 @@ fun! LoadManager#LoadSuite(suitename)
             LogNotice "Loading the plugin ".key
             call s:rtp_add(value["path"])
             let value["load"]="loaded"
+            exec "runtime! plugin/*.vim"
+            exec "runtime! after/*.vim"
+            call s:helptags(value["path"])
         endif
         unlet value
     endfor 
@@ -103,6 +107,7 @@ fun! LoadManager#LoadPlugin(...)
         call s:rtp_add(plugin["path"])
         exec "runtime! plugin/*.vim"
         exec "runtime! after/*.vim"
+        call s:helptags(plugin["path"])
     endif
 
     if a:0 == 2
@@ -117,6 +122,7 @@ fun! LoadManager#LoadPlugin(...)
         call s:rtp_add(plugin["path"])
         exec "runtime! plugin/*.vim"
         exec "runtime! after/*.vim"
+        call s:helptags(plugin["path"])
     endif
 endf
 
@@ -161,4 +167,30 @@ endf
 fun! s:rtp_add(path)
     exec "set rtp^=".fnameescape(a:path)
     exec "set rtp+=".fnameescape(a:path)
+endf
+
+
+func! s:has_doc(rtp) abort
+    LogDebug "help doc to ".a:rtp
+    return isdirectory(a:rtp.'/doc')
+                \   && (!filereadable(a:rtp.'/doc/tags') || filewritable(a:rtp.'/doc/tags'))
+                \   && (v:version > 702 || (v:version == 702 && has("patch51")))
+                \     ? !(empty(glob(a:rtp.'/doc/*.txt', 1)) && empty(glob(a:rtp.'/doc/*.??x', 1)))
+                \     : !(empty(glob(a:rtp.'/doc/*.txt')) && empty(glob(a:rtp.'/doc/*.??x')))
+endf
+
+func! s:helptags(rtp) abort
+    if !s:has_doc(a:rtp)
+        return
+    endif
+
+    let doc_path = a:rtp.'/doc/'
+    LogNotice ':helptags '.doc_path
+    try
+        execute 'helptags ' . doc_path
+    catch
+        LogNotice "> Error running :helptags ".doc_path
+        return 0
+    endtry
+    return 1
 endf
